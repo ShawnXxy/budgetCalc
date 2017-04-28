@@ -60,7 +60,7 @@ var budgetController = (function() {
 }) (); // end of budgetController()
 
 /**
- * 
+ *  
  */
 var UIController = (function() {
     // get input shown on interface
