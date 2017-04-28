@@ -1,61 +1,131 @@
-//create a variable to store all button class for easy change purpose
-var DOMstrings={
-  inputType:".add__type",
-  inputDescription:".add__description",
-  inputValue:".add__value",
-  inputBtn:".add__btn"
-};/*--end of DOMstrings---*/
+/**
+ * STORE DATA
+ */
+var budgetController = (function() {
+    // Expense constructor
+    var Expense = function(id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+    // Income constructor
+    var Income = function(id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+   
+    // var expenseList = [];
+    // var incomeList = [];
+    // var incomeTotal = 0;
+    // var expenseTotal = 0;
+    var data = {
+        // expenseList : [],
+        // incomeList : [],
+        // incomeTotal : 0,
+        // expenseTotal : 0
+        class : {
+            expense:  [],
+            income : []
+        },
+        total : {
+            expense : 0,
+            income : 0
+        }
+    }; // end data object
 
-//using IIFE so the variables in between each function does not affect on each other
-//Budget CONTROLLER
-var budgetController=(function(){
+    return {
+        addItem : function(type, description, value) { // type could be +/-
+            var newItem;
+            var id;
+            if (data.class[type].length > 0) { // in case of arrayIndexOutOfBound
+                id = data.class[type][data.class[type].length - 1].id + 1; // id used for distinguish different items. id will be updated based on previous record
+            } else {
+                id = 0;
+            }
 
-})();/*---end of budgetController function---*/
+            if (type == 'expense') {
+                // add to new Expense list
+                newItem = new Expense(id, description, value);
+            } else if (type == 'income') {
+                // add to new Income list
+                newItem = new Income(id, description, value);
+            }
+            // push above record into data object
+            data.class[type].push(newItem);
+            return newItem;
+        } // end of addItem()
+    }
 
-//UI controller
-var UIController=(function(){
-  return{
-    //read data from UI
-    /*---define properties in ojbect, using : instead of = and end with , instead of :   */
-    getInput:function(){
-      return{
-        //get value of .add__type class, will be either inc or exp
-        type:document.querySelector(DOMstrings.inputType).value,
-        //get value of .add__description class
-        description:document.querySelector(DOMstrings.inputDescription).value,
-        //get value of .add__value class
-        value:document.querySelector(DOMstrings.inputValue).value
-      };/*---end of return---*/
-    }/*---end of getinput function---*/
-  };/*---end of return---*/
-})();/*---end of UIController fucntion---*/
+}) (); // end of budgetController()
 
-//GLOBAL APP CONTROLLER
-var controller=(function(budgetCtrl,UICtrl){
-  //create a function event once the checkmark is clicked
-  var ctrlAddItem=function(){
-    //get the filed input data
-    var input=UICtrl.getInput();
-    console.log(input);
-    //add the item to the budget controller
+/**
+ * 
+ */
+var UIController = (function() {
+    // get input shown on interface
+    return {
+        getInput : function() {
+            return {
+                // fetch value if type + as for income or - as for expense
+                type : document.querySelector('.add-type').value,
+                // fetch value of description
+                description : document.querySelector('.add-description').value,
+                // fetch value of $ number
+                value : document.querySelector('.add-value').value
+            };          
+        }, // end of getInput()
+        addListItem : function(obj, type) {
+            // STEP 1 : create HTML with placehoder text
+            // STEP 2 : 
+        }
+    };
+}) (); // end of UIController
 
-    //add new item to the UI
+/**
+ * GlOBAL APP CONTROLLER
+ */
+var controller = (function(budgetController, UIController) {
+    var input;
+    var newItem;
+    //addBtn events bind   
+    var addBtnEvent = function() {
+        // STEP 1 : get the input.
+        input = UIController.getInput(); // function getInput() is defined in UIController
+        // STEP 2 : add item to budget. The item info is based upon input in STEP 1
+        newItem = budgetController.addItem(input.type, input.description, input.value); // addItem() is defined in budgetController
+        // STEP 3 : add item to UI
 
-    //calculate the budget
+        // STEP 4 : calculate
 
-    //display budget on UI
+        // STEP 5 : display on UI
 
-  }/*---end of ctrlAddItem function---*/
+    }; // end of addBtnEvent
 
-  //monitor the event function and apply the function when checkmark button clicked
-  document.querySelector(DOMstrings.inputBtn).addEventListener("click",function(){
-    ctrlAddItem();
-  });/*---end of add__btn event---*/
+    // when addBtn clicked
+    document.querySelector('addBtn').addEventListener('click', addBtnEvent);
 
-  //apply above function when ENTER KEY pressed too
-  document.addEventListener("keypress",function(event){
-    if (event.keycode===13){/*--13 is the keycode for ENTER--*/
-      ctrlAddItem();
-    }/*---end of keycode 13 statement---*/
-  });/*---end of keypress event listener---*/
-})(budgetController,UIController);/*---end of controller function---*/
+    // when Enter is hit : keyboard event
+    document.addEventListener('keypress', function(event) {
+        if (event.keyCode == 13) {
+            addBtnEvent();   
+        }
+    }); // end of keypress
+
+}) (budgetController, UIController); // end of controller
+
+/**
+ * INITIALIZATION
+ */
+var init = function() {
+    // when addBtn clicked
+    document.querySelector('addBtn').addEventListener('click', addBtnEvent);
+
+    // when Enter is hit : keyboard event
+    document.addEventListener('keypress', function(event) {
+        if (event.keyCode == 13) {
+            addBtnEvent();   
+        }
+    });
+}
+init();
