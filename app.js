@@ -31,15 +31,26 @@ var budgetController = (function() {
         total : {
             expense : 0,
             income : 0
-        }
+        },
+        budeget : 0
     }; // end data object
 
+    var calculation = function(type) {
+        var sum = 0; 
+            data.class(type).forEach(function(cur) {
+                sum += cur.value;
+            });
+            data.total[type] = sum;
+    }
+
     return {
-        addItem : function(type, description, value) { // type could be +/-
+        addItem : function(type, description, value) { // type will be +/-
             var newItem;
-            var id;
-            if (data.class[type].length > 0) { // in case of arrayIndexOutOfBound
-                id = data.class[type][data.class[type].length - 1].id + 1; // id used for distinguish different items. id will be updated based on previous record
+            var id; // id used for distinguish different items. id will be updated based on previous record
+
+            // in case of arrayIndexOutOfBound
+            if (data.class[type].length > 0) { 
+                id = data.class[type][data.class[type].length - 1].id + 1; 
             } else {
                 id = 0;
             }
@@ -54,13 +65,28 @@ var budgetController = (function() {
             // push above record into data object
             data.class[type].push(newItem);
             return newItem;
-        } // end of addItem()
-    }
+        }, // end of addItem()
 
+        getBudget : function() {
+            return {
+                budget : data.budeget,
+                incomeTotal : data.total.income,
+                expenseTotal : data.total.expense
+            };
+        },
+        
+        calculateBudget : function() {
+            // calculate total income and expenses
+            calculation('expenses');
+            calculation('income');
+            // calculate the budeget : income - expenses
+            data.budeget = data.total.income - data.total.expenses;
+        } // end of calcuate()
+    } // end of return
 }) (); // end of budgetController()
 
 /**
- *  
+ *  DISPLAY ON INTERFACE
  */
 var UIController = (function() {
     // get input shown on interface
@@ -68,17 +94,32 @@ var UIController = (function() {
         getInput : function() {
             return {
                 // fetch value if type + as for income or - as for expense
-                type : document.querySelector('.add-type').value,
+                type : document.getElementsByClassName('add-type').value,
                 // fetch value of description
-                description : document.querySelector('.add-description').value,
+                description : document.getElementsByClassName('add-description').value,
                 // fetch value of $ number
-                value : document.querySelector('.add-value').value
+                value : parseFloat(document.getElementsByClassName('add-value').value) //convert string to number
             };          
         }, // end of getInput()
-        addListItem : function(obj, type) {
+        addListItem : function(item, type) {
+            var html;
+            var newHtml; // updated every time when new item added to list
+            var className; // helps define class name for later use
             // STEP 1 : create HTML with placehoder text
-            // STEP 2 : 
-        }
+            if (type == 'income') {
+                className = 'income-list';
+                html = '<div class="item clearfix" id="income-%id%"><div class="item-description">%description%</div><div class="right clearfix"><div class="item-value">%value%</div><div class="item-delete"><button class="item-delete-btn"><i class="ion-ios-close-outline"></i></button> </div></div></div>'
+            } else if (type == 'expense') {
+                className = 'expenses-list';
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item-description">%description%</div><div class="right clearfix"><div class="item-value">%value%</div><div class="item-delete"><button class="item-delete-btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            }         
+            // STEP 2 : replace the placeholder text
+            newHtml = html.replace('%id%', obj.id);
+            newHtml = newHtml.replace('%description%', obj.description);
+            newHtml = newHtml.replace('%value%', obj.value);
+            //STEP 3 :  insert HTML into DOM
+            document.getElementsByClassName(className).insertAdjacentHTML('beforeend', newHtml);
+        } // end of addListItem()
     };
 }) (); // end of UIController
 
@@ -88,22 +129,31 @@ var UIController = (function() {
 var controller = (function(budgetController, UIController) {
     var input;
     var newItem;
-    //addBtn events bind   
+
+    var updateBudget = function() {
+        // STEP 1 : calculate
+        budgetController.calculateBudget();
+        // STEP 2 : return
+        var budeget = budgetController.getBudget();
+        // STEP 3 : display
+    };
+
+    //addBtn events bind: what happened if addBtn is clicked?
     var addBtnEvent = function() {
         // STEP 1 : get the input.
         input = UIController.getInput(); // function getInput() is defined in UIController
-        // STEP 2 : add item to budget. The item info is based upon input in STEP 1
-        newItem = budgetController.addItem(input.type, input.description, input.value); // addItem() is defined in budgetController
-        // STEP 3 : add item to UI
-
-        // STEP 4 : calculate
-
-        // STEP 5 : display on UI
-
+        if (input.description != '' && !isNaN(input.value) && input.value > 0) { //description cannot be empty and number should be number
+            // STEP 2 : add item to budget. The item info is based upon input in STEP 1
+            newItem = budgetController.addItem(input.type, input.description, input.value); // addItem() is defined in budgetController
+            // STEP 3 : add item to UI
+            UIController.addListItem(newItem, input.type);
+            // STEP 4 : calculate and display on UI
+            updateBudget();
+        }     
     }; // end of addBtnEvent
 
     // when addBtn clicked
-    document.querySelector('addBtn').addEventListener('click', addBtnEvent);
+    document.getElementsByClassName('addBtn').addEventListener('click', addBtnEvent);
 
     // when Enter is hit : keyboard event
     document.addEventListener('keypress', function(event) {
@@ -117,15 +167,15 @@ var controller = (function(budgetController, UIController) {
 /**
  * INITIALIZATION
  */
-var init = function() {
-    // when addBtn clicked
-    document.querySelector('addBtn').addEventListener('click', addBtnEvent);
+// var init = function() {
+//     // when addBtn clicked
+//     document.getElementsByClassName('addBtn').addEventListener('click', addBtnEvent);
 
-    // when Enter is hit : keyboard event
-    document.addEventListener('keypress', function(event) {
-        if (event.keyCode == 13) {
-            addBtnEvent();   
-        }
-    });
-}
-init();
+//     // when Enter is hit : keyboard event
+//     document.addEventListener('keypress', function(event) {
+//         if (event.keyCode == 13) {
+//             addBtnEvent();   
+//         }
+//     });
+// }
+// init();

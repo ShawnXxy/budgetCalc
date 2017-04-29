@@ -23,14 +23,8 @@ body {
     font-weight: 400;
 }
 
-.right {
+.total {
   float: right;
-}
-.red {
-  color: #FF5049 !important;
-}
-.red-focus:focus {
-  border: 1px solid #FF5049 !important;
 }
 
 /**********************************************
@@ -98,21 +92,6 @@ body {
     float: left;
 }
 
-.budget-income-percentage,
-.budget-expenses-percentage {
-    float: left;
-    width: 34px;
-    font-size: 11px;
-    padding: 3px 0;
-    margin-left: 10px;
-}
-
-.budget-expenses-percentage {
-    background-color: rgba(255, 255, 255, 0.2);
-    text-align: center;
-    border-radius: 3px;
-}
-
 /**********************************************
 *** BOTTOM PART
 **********************************************/
@@ -157,6 +136,7 @@ body {
 .add-description {
   width: 400px;
 }
+
 .add-value {
   width: 100px;
 }
@@ -215,6 +195,7 @@ h2 {
 .income-title {
   color: #28B9B5;
 }
+
 .expenses-title {
   color: #FF5049;
 }
@@ -227,6 +208,7 @@ h2 {
 .item:first-child {
   border-top: 1px solid #e7e7e7;
 }
+
 .item:nth-child(even) {
   background-color: #f7f7f7;
 }
@@ -240,25 +222,13 @@ h2 {
     transition: transform 0.3s;
 }
 
-.item-percentage {
-    float: left;
-    margin-left: 20px;
-    transition: transform 0.3s;
-    font-size: 11px;
-    background-color: #FFDAD9;
-    padding: 3px;
-    border-radius: 3px;
-    width: 32px;
-    text-align: center;
-}
-
 .income .item-value,
 .income .item-delete-btn {
     color: #28B9B5;
 }
 
 .expenses .item-value,
-.expenses .item-percentage,
+/*.expenses .item-percentage,*/
 .expenses .item-delete-btn {
     color: #FF5049;
 }
@@ -282,6 +252,7 @@ h2 {
 .item-delete-btn:focus {
   outline: none;
 }
+
 .item-delete-btn:active {
   transform: translateY(2px);
 }
@@ -289,10 +260,8 @@ h2 {
 .item:hover .item-delete-btn {
   display: block;
 }
+
 .item:hover .item-value {
-  transform: translateX(-20px);
-}
-.item:hover .item-percentage {
   transform: translateX(-20px);
 }
 
@@ -302,9 +271,6 @@ h2 {
     color: #FF5049;
 }
 
-.unpaid .item-percentage {
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-}
 .unpaid:hover .item-description {
   font-weight: 900;
 }
